@@ -1,0 +1,48 @@
+name: Java CI with Maven
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    
+    # Set up matrix for different operating systems
+    runs-on: ubuntu-latest
+
+    # Set up JDK 17
+    steps:
+    - uses: actions/checkout@v3
+    - name: Set up JDK 17
+      uses: actions/setup-java@v3
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+        cache: maven
+
+    # validate: check if all information necessary for the build is available
+    - name: Validate maven build
+      run: mvn -B validate --file pom.xml
+
+    # compile: compile the source code
+    - name: Compile with Maven
+      run: mvn -B compile --file pom.xml
+
+    # test-compile: compile the test source code
+    - name: Test compile with Maven
+      run: mvn -B test-compile --file pom.xml
+
+    # test: run unit tests
+    - name: Test with Maven
+      run: mvn -B test --file pom.xml
+
+    # package: package compiled source code into the distributable format (jar, war, etc.)
+    - name: Package with Maven
+      run: mvn -B package --file pom.xml
+
+    # Save the JAR file as an artifact
+    - name: Upload artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: Sum
+        path: target/*.jar
